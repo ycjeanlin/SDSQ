@@ -116,7 +116,7 @@ public class RecDriver implements LibrecTool {
         if (!(cmd.hasOption("D") || cmd.hasOption("conf"))){
         	//Default: run item-based CF
         	Properties prop = new Properties();
-            prop.load(new FileInputStream("./src/main/resources/rec/cf/itemknn-testranking.properties"));
+            prop.load(new FileInputStream("./core/src/main/resources/rec/cf/itemknn-testranking.properties"));
             for (String name : prop.stringPropertyNames()) {
                 conf.set(name, prop.getProperty(name));
             }
@@ -219,13 +219,14 @@ public class RecDriver implements LibrecTool {
 	private void parseInputData(String dataPath) throws IOException {
 		System.out.println(dataPath);
 		BufferedReader br = new BufferedReader(new FileReader(dataPath));
-        boolean dataFlag = false;
-        boolean arrive_II = false;
+		BufferedWriter bw1 = new BufferedWriter(new FileWriter("./data/test/SDSQ-rel/relation.txt"));
+		BufferedWriter bw2 = new BufferedWriter(new FileWriter("./temp_div.txt"));
+		BufferedWriter bw3 = new BufferedWriter(new FileWriter("./data/SDSQ/subscribe.txt"));
+
+        int arrive = 1;
 
         String line = null;
         String[] data = null;
-        ArrayList<String> newOutputUIR = new ArrayList<String>();
-        ArrayList<String> newOutputDiv = new ArrayList<String>();
 
         while (true) {
         	 line = br.readLine();
@@ -238,43 +239,40 @@ public class RecDriver implements LibrecTool {
         	 data = line.trim().split("[ \t]");
         	 
              if(data.length == 3){
-            	 arrive_II = true;
-             }else if(arrive_II && data.length == 2) {
-            	 arrive_II = false;
-            	 dataFlag = true;
+            	 arrive = 2;
+             }else if(arrive == 2 && data.length == 2) {
+            	 arrive = 3;
              }
              
-        	 // parse DATA if valid
-             if (dataFlag) {
-            	 // parse RELATION
+             // parse RELATION
+             if (arrive == 1 && data.length == 2){
             	 String newLine = "";
             	 newLine = newLine.concat(data[1] + " " + data[0] + " 1");
-            	 newOutputUIR.add(newLine);
+            	 bw1.write(newLine);
+                 bw1.newLine();
              }
-             
-             if(arrive_II){
-            	 // parse RELATION
+ 
+             // parse DIVERSITY
+             if(arrive == 2){
             	 String newLine = "";
             	 newLine = newLine.concat(data[0] + " " + data[1] + " " + data[2]);
-            	 newOutputDiv.add(newLine);
+            	 bw2.write(newLine);
+                 bw2.newLine();
              }
 
+             // parse RATINS
+             if (arrive == 3) {
+            	 String newLine = "";
+            	 newLine = newLine.concat(data[1] + " " + data[0] + " 1");
+            	 bw3.write(newLine);
+                 bw3.newLine();
+             }
          }
          br.close();
-         
-         BufferedWriter bw = new BufferedWriter(new FileWriter("./temp_div.txt"));
-         for(String l:newOutputDiv){
-        	 bw.write(l);
-             bw.newLine();
-         }
-         bw.close();
-         
-         bw = new BufferedWriter(new FileWriter("../data/SDSQ/subcribe.txt"));
-         for(String l:newOutputUIR){
-        	 bw.write(l);
-             bw.newLine();
-         }
-         bw.close();
+         bw1.close();
+         bw2.close();
+         bw3.close();
+
 	}
 
 
@@ -294,6 +292,8 @@ public class RecDriver implements LibrecTool {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
         
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        
         if (cmd.hasOption("build")) {
             ;
         } else if (cmd.hasOption("load")) {
@@ -303,8 +303,5 @@ public class RecDriver implements LibrecTool {
         } else if (cmd.hasOption("exec")) {
             tool.run(args);
         }
-        
-		
-        //System.out.println("Working Directory = " + System.getProperty("user.dir"));
     }
 }

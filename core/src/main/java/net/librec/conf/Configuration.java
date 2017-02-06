@@ -86,18 +86,22 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
 
     static {
         ClassLoader cL = Thread.currentThread().getContextClassLoader();
+        
         if (cL == null) {
             cL = Configuration.class.getClassLoader();
         }
         if (cL.getResource("librec.properties") != null) {
             LOG.warn("DEPRECATED: librec.properties found in the classpath. ");
+            System.out.println("HERE");
         }
         // if (cL.getResource("driver.classes.props") != null) {
         // LOG.warn("DEPRECATED: driver.classes.props found in the classpath.
         // ");
         // }
+   
         addDefaultResource("librec.properties");
         // addDefaultResource("driver.classes.props");
+
     }
 
     public static class Resource {

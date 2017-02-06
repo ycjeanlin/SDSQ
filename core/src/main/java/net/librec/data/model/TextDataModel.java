@@ -62,6 +62,7 @@ public class TextDataModel extends AbstractDataModel implements DataModel {
     @Override
     public void buildConvert() throws LibrecException {
         String inputDataPath = conf.get(Configured.CONF_DFS_DATA_DIR) + "/" + conf.get(Configured.CONF_DATA_INPUT_PATH);
+        //String inputDataPath = conf.get("./data/SDSQ");
         String dataColumnFormat = conf.get(Configured.CONF_DATA_COLUMN_FORMAT, "UIR");
         dataConvertor = new TextDataConvertor(dataColumnFormat, inputDataPath, conf.getDouble("data.convert.binarize.threshold", -1.0));
         try {
