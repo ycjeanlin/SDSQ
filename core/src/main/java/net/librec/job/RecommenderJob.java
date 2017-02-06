@@ -268,8 +268,10 @@ public class RecommenderJob {
             }
             String resultData = sb.toString();
             // save resultData
+            String tmpOutput = "./list.txt";
             try {
                 FileUtil.writeString(outputPath, resultData);
+                FileUtil.writeString(tmpOutput, resultData);
             } catch (Exception e) {
                 e.printStackTrace();
             }
